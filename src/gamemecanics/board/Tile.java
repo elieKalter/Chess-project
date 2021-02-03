@@ -12,7 +12,12 @@ import gamemecanics.pieces.Piece;
  */
 public class Tile {
     private boolean occupied;
+    private Color color;
     private Piece piece;
+
+    public Tile(Color c) {
+        this.color = c;
+    }
 
     public boolean isOccupied() {
         return occupied;
@@ -29,6 +34,17 @@ public class Tile {
     public void setPiece(Piece piece) {
         this.piece = piece;
     }
+
+    public Color getColor() {
+        return color;
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
+    }
     
-    
+    enum Color {
+        white,
+        black
+    }
 }

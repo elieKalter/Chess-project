@@ -19,6 +19,10 @@ public class Bishop extends Piece {
     public Bishop() {
         super();
     }
+    
+    public Bishop(Colors color) {
+        super(color, 3);
+    }
 
     public Bishop(Colors color, boolean moved, ListOfMoves list, LocationIn2DArray location) {
         super(color, moved, 3, list, location);

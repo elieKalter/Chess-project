@@ -30,6 +30,14 @@ public abstract class Piece {
         this.location = new LocationIn2DArray();
         this.list = new ListOfMoves();
     }
+    
+    public Piece(Colors color, int value) {
+        this.color = color;
+        this.moved = false;
+        this.value = value;
+        this.location = new LocationIn2DArray();
+        this.list = new ListOfMoves();
+    }
 
     public Piece(Colors color, boolean moved, int value, ListOfMoves list, LocationIn2DArray location) {
         this.color = color;

@@ -20,6 +20,10 @@ public class Rook extends Piece{
     public Rook() {
         super();
     }
+    
+    public Rook(Colors color){
+        super(color, 5);
+    }
 
     public Rook(Colors color, boolean moved, ListOfMoves list, LocationIn2DArray location) {
         super(color, moved, 5, list, location);

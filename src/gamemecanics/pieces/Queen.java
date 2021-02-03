@@ -19,6 +19,10 @@ public class Queen extends Piece{
     public Queen() {
         super();
     }
+    
+    public Queen(Colors color){
+        super(color, 9);
+    }
 
     public Queen(Colors color, boolean moved, ListOfMoves list, LocationIn2DArray location) {
         super(color, moved, 9, list, location);

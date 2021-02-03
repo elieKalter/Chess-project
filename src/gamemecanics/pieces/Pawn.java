@@ -22,6 +22,11 @@ public class Pawn extends Piece{
         wjmtft = false;
     }
     
+    public Pawn(Colors color) {
+        super(color, 1);
+        wjmtft = false;
+    }
+    
     public Pawn(Colors color, boolean moved, ListOfMoves list, LocationIn2DArray location){
         this(color, moved, list, location, false);
     }

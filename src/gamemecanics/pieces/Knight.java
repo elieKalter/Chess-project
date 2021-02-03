@@ -20,6 +20,10 @@ public class Knight extends Piece{
         super();
     }
     
+    public Knight(Colors color){
+        super(color, 3);
+    }
+    
     public Knight(Colors color, boolean moved, ListOfMoves list, LocationIn2DArray location){
         super(color, moved, 3, list, location);
     }

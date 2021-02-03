@@ -20,6 +20,10 @@ public class King extends Piece{
         super();
     }
     
+    public King(Colors color) {
+        super(color, 10);
+    }
+    
     public King(Colors color, boolean moved, ListOfMoves list, LocationIn2DArray location){
         super(color, moved, 10, list, location);
     }
