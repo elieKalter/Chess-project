@@ -7,8 +7,11 @@ package gamemecanics.pieces;
 
 import fbg.Colors;
 import fbg.LocationIn2DArray;
-import gamemecanics.board.Board;
-import gamemecanics.etc.ListOfMoves;
+import gamemecanics.board.Tile;
+import gamemecanics.etc.Move;
+import gamemecanics.etc.Move.TypeOfConsequences;
+import gamemecanics.etc.SourceAndDestinationLocations;
+import java.util.LinkedList;
 
 /**
  *
@@ -24,7 +27,7 @@ public class King extends Piece{
         super(color, 10);
     }
     
-    public King(Colors color, boolean moved, ListOfMoves list, LocationIn2DArray location){
+    public King(Colors color, boolean moved, LinkedList<Move> list, LocationIn2DArray location){
         super(color, moved, 10, list, location);
     }
     
@@ -37,8 +40,8 @@ public class King extends Piece{
     }
 
     @Override
-    public void makeList(Board b) {
-        this.list.getListOfMoves().clear();
+    public void makeList(Tile[][] b) {
+        this.list.clear();
         LocationIn2DArray tmp;
 
         for (int i = -1; i < 2; i++) {
@@ -48,9 +51,11 @@ public class King extends Piece{
                 }
                 tmp = this.location.add(i, j);
                 if(f.validLocation(tmp) 
-                        && (!b.getBoard()[tmp.getRow()][tmp.getColumn()].isOccupied()
-                        || b.getBoard()[tmp.getRow()][tmp.getColumn()].getPiece().color != this.color)){
-                    addMove(tmp);
+                        && (!b[tmp.getRow()][tmp.getColumn()].isOccupied()
+                        || b[tmp.getRow()][tmp.getColumn()].getPiece().color != this.color)){
+                    SourceAndDestinationLocations sourceDes = new SourceAndDestinationLocations(location, tmp);
+                    Move m = new Move(sourceDes, calcCosequences(b, sourceDes, 0, ""));
+                    addMove(m);
                 }
             }
         }
@@ -60,5 +65,23 @@ public class King extends Piece{
     public Piece clone() {
         return new King(this.color, this.moved, this.list, this.location);
     }
-    
+
+    @Override
+    public String toString() {
+        if (this.color == Colors.White) {
+            return "K";
+        } else {
+            return "k";
+        }
+    }
+
+    @Override
+    protected TypeOfConsequences calcCosequences(Tile[][] b, SourceAndDestinationLocations sourceDes, int tb, String info) {
+        Tile desTile = b[sourceDes.getDestination().getRow()][sourceDes.getDestination().getColumn()];
+        if (desTile.isOccupied()) {
+            return Move.TypeOfConsequences.take;
+        } else {
+            return Move.TypeOfConsequences.nothing;
+        }
+    }
 }

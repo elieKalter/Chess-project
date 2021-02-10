@@ -11,14 +11,14 @@ import fbg.LocationIn2DArray;
  *
  * @author elie
  */
-public class MoveSourceDestination {
+public class SourceAndDestinationLocations {
     private LocationIn2DArray source;
     private LocationIn2DArray destination;
 
-    public MoveSourceDestination() {
+    public SourceAndDestinationLocations() {
     }
 
-    public MoveSourceDestination(LocationIn2DArray source, LocationIn2DArray destination) {
+    public SourceAndDestinationLocations(LocationIn2DArray source, LocationIn2DArray destination) {
         this.source = source;
         this.destination = destination;
     }

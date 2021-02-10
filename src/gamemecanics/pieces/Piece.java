@@ -7,10 +7,12 @@ package gamemecanics.pieces;
 
 import fbg.Colors;
 import fbg.LocationIn2DArray;
-import gamemecanics.board.Board;
-import gamemecanics.etc.ListOfMoves;
+import gamemecanics.board.Tile;
 import gamemecanics.etc.Functions;
-import gamemecanics.etc.MoveSourceDestination;
+import gamemecanics.etc.Move;
+import gamemecanics.etc.Move.TypeOfConsequences;
+import gamemecanics.etc.SourceAndDestinationLocations;
+import java.util.LinkedList;
 
 
 /**
@@ -22,13 +24,13 @@ public abstract class Piece {
     protected Colors color;
     protected boolean moved;
     protected int value;
-    protected ListOfMoves list;
+    protected LinkedList<Move> list;
     protected LocationIn2DArray location;
 
     public Piece() {
         this.moved = false;
         this.location = new LocationIn2DArray();
-        this.list = new ListOfMoves();
+        this.list = new LinkedList<>();
     }
     
     public Piece(Colors color, int value) {
@@ -36,10 +38,10 @@ public abstract class Piece {
         this.moved = false;
         this.value = value;
         this.location = new LocationIn2DArray();
-        this.list = new ListOfMoves();
+        this.list = new LinkedList<>();
     }
 
-    public Piece(Colors color, boolean moved, int value, ListOfMoves list, LocationIn2DArray location) {
+    public Piece(Colors color, boolean moved, int value, LinkedList<Move> list, LocationIn2DArray location) {
         this.color = color;
         this.moved = moved;
         this.value = value;
@@ -47,12 +49,56 @@ public abstract class Piece {
         this.location = location;
     }
     
-    abstract public void makeList(Board b);
+    abstract public void makeList(Tile[][] b);
+    abstract protected TypeOfConsequences calcCosequences(Tile[][] b,
+                                                            SourceAndDestinationLocations sourceDes,
+                                                            int tb,
+                                                            String info);
+    abstract public String toString();
     abstract public Piece clone();
     
-    protected void addMove(LocationIn2DArray l){
-        MoveSourceDestination m = new MoveSourceDestination(l, this.location);
-        this.list.getListOfMoves().add(m);
+    protected void addMove(Move m){
+        this.list.add(m);
+    }
+
+    public Colors getColor() {
+        return color;
+    }
+
+    public void setColor(Colors color) {
+        this.color = color;
+    }
+
+    public boolean isMoved() {
+        return moved;
+    }
+
+    public void setMoved(boolean moved) {
+        this.moved = moved;
+    }
+
+    public int getValue() {
+        return value;
+    }
+
+    public void setValue(int value) {
+        this.value = value;
+    }
+
+    public LinkedList<Move> getList() {
+        return list;
+    }
+
+    public void setList(LinkedList<Move> list) {
+        this.list = list;
+    }
+
+    public LocationIn2DArray getLocation() {
+        return location;
+    }
+
+    public void setLocation(LocationIn2DArray location) {
+        this.location = location;
     }
 }
 

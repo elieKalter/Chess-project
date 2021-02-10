@@ -7,8 +7,11 @@ package gamemecanics.pieces;
 
 import fbg.Colors;
 import fbg.LocationIn2DArray;
-import gamemecanics.board.Board;
-import gamemecanics.etc.ListOfMoves;
+import gamemecanics.board.Tile;
+import gamemecanics.etc.Move;
+import gamemecanics.etc.Move.TypeOfConsequences;
+import gamemecanics.etc.SourceAndDestinationLocations;
+import java.util.LinkedList;
 
 /**
  *
@@ -27,11 +30,11 @@ public class Pawn extends Piece{
         wjmtft = false;
     }
     
-    public Pawn(Colors color, boolean moved, ListOfMoves list, LocationIn2DArray location){
+    public Pawn(Colors color, boolean moved, LinkedList<Move> list, LocationIn2DArray location){
         this(color, moved, list, location, false);
     }
     
-    public Pawn(Colors color, boolean moved, ListOfMoves list, LocationIn2DArray location, boolean wjmtft){
+    public Pawn(Colors color, boolean moved, LinkedList<Move> list, LocationIn2DArray location, boolean wjmtft){
         super(color, moved, 1, list, location);
         this.wjmtft = wjmtft;
     }
@@ -46,61 +49,59 @@ public class Pawn extends Piece{
     }
     
     @Override
-    public void makeList(Board b) {
-        this.list.getListOfMoves().clear();
+    public void makeList(Tile[][] b) {
+        this.list.clear();
         LocationIn2DArray tmp; // well hold places to check if possible to move to
         LocationIn2DArray tmp2; // well hold places to check some things about when checking if to move to a place held in tmp
         int tb = (this.color == Colors.White)? 1 : -1; //this var well determine if forward is towords the top or bottom
         
         //1 and 2 forward
         tmp = this.location.add(tb, 0); // 1 forward
-        if (f.validLocation(tmp) && !b.getBoard()[tmp.getRow()][tmp.getColumn()].isOccupied()) {
-            addMove(tmp);
+        if (f.validLocation(tmp) && !b[tmp.getRow()][tmp.getColumn()].isOccupied()) {
+            SourceAndDestinationLocations sourceDes = new SourceAndDestinationLocations(location, tmp);
+            Move m = new Move(sourceDes, calcCosequences(b, sourceDes, tb, "one forward"));
+            addMove(m);
+            
             tmp.add(tb, 0); // 2 forward
             if (f.validLocation(tmp) && !this.moved && 
-                    !b.getBoard()[tmp.getRow()][tmp.getColumn()].isOccupied()) {
-                addMove(tmp);
+                    !b[tmp.getRow()][tmp.getColumn()].isOccupied()) {
+                sourceDes.setDestination(tmp);
+                m.setSourceAndDestination(sourceDes);
+                m.setConsequences(calcCosequences(b, sourceDes, tb, "nothing"));
+                addMove(m);
             }
         }
         
         //diagonal 1
         int direction = 1;
-        tmp = this.location.add(tb, direction);
-        if (f.validLocation(tmp)) {
-            if (b.getBoard()[tmp.getRow()][tmp.getColumn()].isOccupied()
-                    && b.getBoard()[tmp.getRow()][tmp.getColumn()].getPiece().color != this.color) {
-                addMove(tmp);
-            }
-            //en passant
-            tmp2 = location.add(0, direction);
-            Piece piece = b.getBoard()[tmp2.getRow()][tmp2.getColumn()].getPiece();
-            if (piece.getClass() == this.getClass()) {
-                Pawn p = (Pawn) piece;
-                if(!b.getBoard()[tmp.getRow()][tmp.getColumn()].isOccupied()
-                        && p.color != this.color
-                        && p.wjmtft){
-                    addMove(tmp);
-                }
-            }
-        }
+        addDiagonal(b, direction, tb);
         
         //diagonal 2
         direction = -1;
-        tmp = this.location.add(tb, direction);
+        addDiagonal(b, direction, tb);
+    }    
+    
+    private void addDiagonal(Tile[][] b, int direction, int tb){
+        LocationIn2DArray tmp = this.location.add(tb, direction);
+        LocationIn2DArray tmp2;
         if (f.validLocation(tmp)) {
-            if (b.getBoard()[tmp.getRow()][tmp.getColumn()].isOccupied()
-                    && b.getBoard()[tmp.getRow()][tmp.getColumn()].getPiece().color != this.color) {
-                addMove(tmp);
+            if (b[tmp.getRow()][tmp.getColumn()].isOccupied()
+                    && b[tmp.getRow()][tmp.getColumn()].getPiece().color != this.color) {
+                SourceAndDestinationLocations sourceDes = new SourceAndDestinationLocations(location, tmp);
+                Move m = new Move(sourceDes, calcCosequences(b, sourceDes, tb, "takes"));
+                addMove(m);
             }
             //en passant
             tmp2 = location.add(0, direction);
-            Piece piece = b.getBoard()[tmp2.getRow()][tmp2.getColumn()].getPiece();
+            Piece piece = b[tmp2.getRow()][tmp2.getColumn()].getPiece();
             if (piece.getClass() == this.getClass()) {
                 Pawn p = (Pawn) piece;
-                if(!b.getBoard()[tmp.getRow()][tmp.getColumn()].isOccupied()
+                if(!b[tmp.getRow()][tmp.getColumn()].isOccupied()
                         && p.color != this.color
                         && p.wjmtft){
-                    addMove(tmp);
+                    SourceAndDestinationLocations sourceDes = new SourceAndDestinationLocations(location, tmp);
+                    Move m = new Move(sourceDes, calcCosequences(b, sourceDes, tb, "en passant"));
+                    addMove(m);
                 }
             }
         }
@@ -109,5 +110,45 @@ public class Pawn extends Piece{
     @Override
     public Pawn clone() {
         return new Pawn(this.color, this.moved, this.list, this.location);
+    }
+    
+    private boolean onLastRow(SourceAndDestinationLocations sourceDes, int tb){
+        return (sourceDes.getDestination().getRow() == 7 && tb == 1) || (sourceDes.getDestination().getRow() == 0 && tb == -1);
+    }
+
+    @Override
+    public String toString() {
+        if (this.color == Colors.White) {
+            return "P";
+        } else {
+            return "p";
+        }
+    }
+
+    @Override
+    protected TypeOfConsequences calcCosequences(Tile[][] b, SourceAndDestinationLocations sourceDes, int tb, String info) {
+        switch(info){
+            case "one forward":{
+                if (onLastRow(sourceDes, tb)) {
+                    return TypeOfConsequences.promotion;
+                } else {
+                    return TypeOfConsequences.nothing;
+                }
+            }
+            case "nothing":{
+                return TypeOfConsequences.nothing;
+            }
+            case "takes":{
+                if (onLastRow(sourceDes, tb)) {
+                    return TypeOfConsequences.take_promotion;
+                } else {
+                    return TypeOfConsequences.take;
+                }
+            }
+            case "en passant":{
+                return TypeOfConsequences.en_passant;
+            }
+            default: return TypeOfConsequences.nothing;
+        }
     }
 }

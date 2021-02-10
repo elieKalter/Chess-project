@@ -7,8 +7,10 @@ package gamemecanics.pieces;
 
 import fbg.Colors;
 import fbg.LocationIn2DArray;
-import gamemecanics.board.Board;
-import gamemecanics.etc.ListOfMoves;
+import gamemecanics.board.Tile;
+import gamemecanics.etc.Move;
+import gamemecanics.etc.SourceAndDestinationLocations;
+import java.util.LinkedList;
 
 /**
  *
@@ -24,7 +26,7 @@ public class Knight extends Piece{
         super(color, 3);
     }
     
-    public Knight(Colors color, boolean moved, ListOfMoves list, LocationIn2DArray location){
+    public Knight(Colors color, boolean moved, LinkedList<Move> list, LocationIn2DArray location){
         super(color, moved, 3, list, location);
     }
     
@@ -37,60 +39,76 @@ public class Knight extends Piece{
     }
 
     @Override
-    public void makeList(Board b) {
-        this.list.getListOfMoves().clear();
+    public void makeList(Tile[][] b) {
+        this.list.clear();
         LocationIn2DArray tmp; // well hold places to check if possible to move to
         
         //i = -2;
         //j = -1;
         tmp = this.location.add(-2, -1);
         if(addLocation(b, tmp)){
-            addMove(tmp);
+            SourceAndDestinationLocations sourceDes = new SourceAndDestinationLocations(location, tmp);
+            Move m = new Move(sourceDes, calcCosequences(b, sourceDes, 0, ""));
+            addMove(m);
         }
         
         //j = 1;
         tmp = this.location.add(-2, 1);
         if(addLocation(b, tmp)){
-            addMove(tmp);
+            SourceAndDestinationLocations sourceDes = new SourceAndDestinationLocations(location, tmp);
+            Move m = new Move(sourceDes, calcCosequences(b, sourceDes, 0, ""));
+            addMove(m); 
         }
         
         //i = -1;
         //j = -2;
         tmp = this.location.add(-1, -2);
         if(addLocation(b, tmp)){
-            addMove(tmp);
+            SourceAndDestinationLocations sourceDes = new SourceAndDestinationLocations(location, tmp);
+            Move m = new Move(sourceDes, calcCosequences(b, sourceDes, 0, ""));
+            addMove(m);
         }
         
         //j = 2;
         tmp = this.location.add(-1, 2);
         if(addLocation(b, tmp)){
-            addMove(tmp);
+            SourceAndDestinationLocations sourceDes = new SourceAndDestinationLocations(location, tmp);
+            Move m = new Move(sourceDes, calcCosequences(b, sourceDes, 0, ""));
+            addMove(m);
         }
         
         //i = 1;
         //j = -2;
         tmp = this.location.add(1, -2);
         if(addLocation(b, tmp)){
-            addMove(tmp);
+            SourceAndDestinationLocations sourceDes = new SourceAndDestinationLocations(location, tmp);
+            Move m = new Move(sourceDes, calcCosequences(b, sourceDes, 0, ""));
+            addMove(m);
         }
         
         //j = 2;
         tmp = this.location.add(1, 2);
         if(addLocation(b, tmp)){
-            addMove(tmp);
+            SourceAndDestinationLocations sourceDes = new SourceAndDestinationLocations(location, tmp);
+            Move m = new Move(sourceDes, calcCosequences(b, sourceDes, 0, ""));
+            addMove(m);
         }
         
         //i = 2;
         //j = -1;
         tmp = this.location.add(2, -1);
         if(addLocation(b, tmp)){
-            addMove(tmp);
+            SourceAndDestinationLocations sourceDes = new SourceAndDestinationLocations(location, tmp);
+            Move m = new Move(sourceDes, calcCosequences(b, sourceDes, 0, ""));
+            addMove(m);
         }
         
         //j = 1;
         tmp = this.location.add(2, 1);
         if(addLocation(b, tmp)){
-            addMove(tmp);
+            SourceAndDestinationLocations sourceDes = new SourceAndDestinationLocations(location, tmp);
+            Move m = new Move(sourceDes, calcCosequences(b, sourceDes, 0, ""));
+            addMove(m);
         }
     }
 
@@ -99,9 +117,28 @@ public class Knight extends Piece{
         return new Knight(this.color, this.moved, this.list, this.location);
     }
     
-    private boolean addLocation(Board b, LocationIn2DArray l){
+    private boolean addLocation(Tile[][] b, LocationIn2DArray l){
         return f.validLocation(l)
-                && (!b.getBoard()[l.getRow()][l.getColumn()].isOccupied()
-                || b.getBoard()[l.getRow()][l.getColumn()].getPiece().color != this.color);
+                && (!b[l.getRow()][l.getColumn()].isOccupied()
+                || b[l.getRow()][l.getColumn()].getPiece().color != this.color);
+    }
+
+    @Override
+    public String toString() {
+        if (this.color == Colors.White) {
+            return "N";
+        } else {
+            return "n";
+        }
+    }
+
+    @Override
+    protected Move.TypeOfConsequences calcCosequences(Tile[][] b, SourceAndDestinationLocations sourceDes, int tb, String info) {
+        Tile desTile = b[sourceDes.getDestination().getRow()][sourceDes.getDestination().getColumn()];
+        if (desTile.isOccupied()) {
+            return Move.TypeOfConsequences.take;
+        } else {
+            return Move.TypeOfConsequences.nothing;
+        }
     }
 }
